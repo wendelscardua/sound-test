@@ -1,0 +1,7 @@
+*.o
+*.nes
+*.dbg
+*.nsf
+soundtrack.txt
+soundtrack.s
+sfx.s
