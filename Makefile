@@ -12,7 +12,7 @@ TARGET=${PROJECT}.nes
 
 default: ${TARGET}
 
-${TARGET}: src/main.o src/reset.o src/readjoy.o src/rand.o src/unrle.o src/vram-buffer.o src/audio-data.o
+${TARGET}: src/main.o src/reset.o src/ggsound.o src/readjoy.o src/rand.o src/unrle.o src/vram-buffer.o src/audio-data.o
 	ld65 $^ -t nes -o ${TARGET} ${LD65_FLAGS}
 
 debug: LD65_FLAGS += --dbgfile ${PROJECT}.nes.dbg
@@ -20,9 +20,9 @@ debug: CA65_FLAGS += -g -DDEBUG=1
 debug: ${TARGET}
 
 src/main.o: src/main.s src/constants.inc src/header.inc \
+	src/ggsound.inc \
 	src/vram-buffer.inc \
 	src/charmap.inc \
-	src/famitone2.s \
 	assets/bg-palettes.pal assets/sprite-palettes.pal \
         assets/metasprites.inc \
 	assets/nametables/*.rle \
@@ -33,7 +33,7 @@ src/audio-data.o: src/audio-data.s assets/audio/sfx.s assets/audio/soundtrack.s
 	ca65 src/audio-data.s ${CA65_FLAGS}
 
 assets/audio/soundtrack.s: assets/audio/soundtrack.txt
-	${TEXT2DATA} $^ -ca65 -allin
+	python ft_txt_to_asm.py assets/audio/soundtrack.txt
 
 assets/audio/soundtrack.txt: assets/audio/soundtrack.ftm
 	${FAMITRACKER} $^ -export $@

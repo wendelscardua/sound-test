@@ -2,42 +2,15 @@
 .include "header.inc"
 .include "charmap.inc"
 .include "vram-buffer.inc"
+.include "ggsound.inc"
 
 .linecont +
 
-; famitone2 config
-FT_PAL_SUPPORT=0
-FT_NTSC_SUPPORT=1
-FT_SFX_ENABLE=1
-FT_THREAD=1
-FT_DPCM_ENABLE=0
-FT_SFX_STREAMS=4
-FT_DPCM_OFF=$c000
-
-; music/sfx constants
+; songs
 .enum music_track
-  PlaceholderTrack
+  NewSong
 .endenum
-
-.enum sfx
-  PlaceholderSFX
-.endenum
-
-.macro SFX effect, channel
-  save_regs
-  LDA #sfx::effect
-  LDX #.ident ( .concat( "FT_SFX_", .string(channel) ) )
-  JSR FamiToneSfxPlay
-  restore_regs
-.endmacro
-
-.macro PLAY track
-.local skip
-  save_regs
-  LDA #music_track::track
-  JSR FamiToneMusicPlay
-  restore_regs
-.endmacro
+; end of songs
 
 .macro SCREEN_OFF
   LDA #$00
@@ -51,13 +24,6 @@ FT_DPCM_OFF=$c000
   LDA #%00011110  ; turn on screen
   STA PPUMASK
 .endmacro
-
-.segment "ZEROPAGE"
-FT_TEMP: .res 3
-.segment "FAMITONE"
-FT_BASE_ADR: .res 186
-.segment "CODE"
-.include "famitone2.s"
 
 .segment "OAM"
 .struct Sprite
@@ -150,7 +116,9 @@ vblankwait:
   BIT PPUSTATUS
   JSR set_scroll
   JSR refresh_oam
-  JSR FamiToneUpdate
+
+  soundengine_update
+
   restore_regs
   RTI
 .endproc
@@ -187,19 +155,31 @@ clear_ram:
 
   SCREEN_ON
 
-  LDX #<music_data
-  LDY #>music_data
-  LDA #1
-  JSR FamiToneInit
+  .import song_list
+  .import instrument_list
+  lda #SOUND_REGION_NTSC
+  sta sound_param_byte_0
+  lda #<song_list
+  sta sound_param_word_0
+  lda #>song_list
+  sta sound_param_word_0+1
+  ; lda #<sfx_list
+  ; sta sound_param_word_1
+  ; lda #>sfx_list
+  ; sta sound_param_word_1+1
+  lda #<instrument_list
+  sta sound_param_word_2
+  lda #>instrument_list
+  sta sound_param_word_2+1
+  ; lda #<dpcm_list
+  ; sta sound_param_word_3
+  ; lda #>dpcm_list
+  ; sta sound_param_word_3+1
+  jsr sound_initialize
 
-  ; init FamiTone SFX
-  LDX #<sfx_data
-  LDY #>sfx_data
-  LDA #1
-  JSR FamiToneSfxInit
-
-  PLAY PlaceholderTrack
-
+  LDA #music_track::NewSong
+  STA sound_param_byte_0
+  JSR play_song
 forever:
   LDA nmis
   CMP old_nmis
