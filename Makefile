@@ -1,8 +1,8 @@
 PROJECT=sound-test
 LD65_FLAGS=
 CA65_FLAGS=
-NSF2DATA=/mnt/c/NESDev/famitone2d/NSF/nsf2data.exe
-TEXT2DATA=/mnt/c/NESDev/famitone2d/text2data.exe
+NSF2DATA=/mnt/c/NESDev/famitone5.0/nsf2data/nsf2data5.exe
+TEXT2DATA=/mnt/c/NESDev/famitone5.0/text2data/text2vol5.exe
 FAMITRACKER=/mnt/c/NESDev/famitracker/FamiTracker.exe
 EMULATOR=/mnt/c/NESDev/Mesen.exe
 
@@ -22,7 +22,7 @@ debug: ${TARGET}
 src/main.o: src/main.s src/constants.inc src/header.inc \
 	src/vram-buffer.inc \
 	src/charmap.inc \
-	src/famitone2.s \
+	src/famitone5.s \
 	assets/bg-palettes.pal assets/sprite-palettes.pal \
         assets/metasprites.inc \
 	assets/nametables/*.rle \
