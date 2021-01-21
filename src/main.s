@@ -5,7 +5,7 @@
 
 .linecont +
 
-; famitone2 config
+; famitone4 config
 FT_PAL_SUPPORT=0
 FT_NTSC_SUPPORT=1
 FT_SFX_ENABLE=1
@@ -57,7 +57,7 @@ FT_TEMP: .res 3
 .segment "FAMITONE"
 FT_BASE_ADR: .res 186
 .segment "CODE"
-.include "famitone2.s"
+.include "famitone4.s"
 
 .segment "OAM"
 .struct Sprite
